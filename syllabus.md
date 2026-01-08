@@ -14,15 +14,13 @@ Laboratory work required. Overview of Internet and World Wide Web; web servers a
 
 ---
 
-## Instructor Contact Information
+## Instructor Contact and Office Hours
 
 | Instructor     | Email          | Class Room |
 |----------------|----------------|------------|
-| Nasreen Arif   | narif@odu.edu  | Zoom       |
+| [Nasreen Arif](https://www.cs.odu.edu/~narif)   | narif@odu.edu  | Zoom       |
 
 **Class Time:** 3:00 pm – 4:15 pm, Monday and Wednesday  
-**First Class Date:** Wednesday, 01/21/2026  
-**Last Class Date:** Monday, 05/04/2026  
 
 **Virtual Office Hours:**  
 Office hours will be held Monday - Thursday by appointment only. Please use the provided link to schedule your [appointment](https://outlook.office.com/book/Fall20025@olddominion.onmicrosoft.com/?ismsaljsauthenabled). All scheduled meetings will take place via Zoom. Once your appointment is confirmed, you will receive a Zoom link in the confirmation email
@@ -227,8 +225,6 @@ Enrollment in this course indicates your acceptance of its teaching focus, requi
 | 15 | Mon, 04/27/2026 | Q/A Session | |
 | 15 | Wed, 04/29/2026 | Milestone Demo 3 Session A | |
 | 16 | Mon, 05/04/2026 | Milestone Demo 3 Session B | Final report due |
-
-> *Course schedule is subject to change depending on instructor availability.*
 
 ---
 
