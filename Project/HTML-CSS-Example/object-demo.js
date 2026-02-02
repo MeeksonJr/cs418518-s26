@@ -11,4 +11,5 @@ let student = {
 
 console.log("Student object:", student);
 console.log("Student Name:", student.name);
+console.log("Student Age:",student.age);
 console.log("Type of student:", typeof(student));
