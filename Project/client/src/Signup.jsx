@@ -42,6 +42,8 @@ export default function Signup({ onRegister }) {
         uin: form.uin,
         email: form.email.toLowerCase(),
       });
+
+      
     }
   }
 
