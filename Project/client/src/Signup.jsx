@@ -22,7 +22,7 @@ export default function Signup({ onRegister }) {
     const e = {};
     if (!form.firstName.trim()) e.firstName = "First name is required";
     if (!form.lastName.trim()) e.lastName = "Last name is required";
-    if (!/^\d{9}$/.test(form.uin)) e.uin = "UIN must be 9 digits";
+    if (!/^\d{8}$/.test(form.uin)) e.uin = "UIN must be 8 digits";
     if (!form.email.includes("@")) e.email = "Valid email required";
     if (form.password.length < 6) e.password = "Minimum 6 characters";
     if (form.password !== form.confirmPassword)
@@ -43,7 +43,7 @@ export default function Signup({ onRegister }) {
         email: form.email.toLowerCase(),
       });
 
-      
+
     }
   }
 

@@ -1,37 +1,52 @@
-import { useState } from 'react';
-import './App.css';
-import Image from './Image';
-import UserInfo from './UserInfo';
-import Signup from './Signup';
+
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ResetPassword from "./pages/ResetPassword";
+import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
+import "./App.css";
 
 function App() {
-  // const [count, setCount] = useState(1)
-    const [submittedUser, setSubmittedUser] = useState(null);
-
-
   return (
-    <>
-      {/* <Image></Image>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <BrowserRouter>
+      <div className="app-container">
+        <Navbar />
+        <main className="main-content">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
-      <UserInfo name="Nasreen" course="Cs418" >Nasreen is teaching CS418</UserInfo>
-      <UserInfo name="Sara" course="CS518" ></UserInfo>
-      <UserInfo name="John" course="Cs471" ></UserInfo>
-      <UserInfo >This is userinfo</UserInfo> */}
-      <Signup onRegister={(user) => setSubmittedUser(user)} />
-    </>
-  )
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Catch all redirect to home or 404 */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
