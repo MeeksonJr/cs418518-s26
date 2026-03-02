@@ -4,12 +4,14 @@ import { useAuth } from "../context/AuthContext";
 import { supabase } from "../supabaseClient";
 import "../Signup.css";
 import Field from "../components/Field";
+import { QRCodeSVG } from "qrcode.react";
 
 export default function Dashboard() {
     const { user, profile } = useAuth();
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [profileMessage, setProfileMessage] = useState("");
+    const [mfaMessage, setMfaMessage] = useState("");
 
     const [passwordForm, setPasswordForm] = useState({
         newPassword: "",
@@ -22,6 +24,11 @@ export default function Dashboard() {
         uin: "",
     });
 
+    // MFA States
+    const [mfaFactors, setMfaFactors] = useState([]);
+    const [enrollData, setEnrollData] = useState(null);
+    const [mfaCode, setMfaCode] = useState("");
+
     // Initialize profile form when profile loads
     useEffect(() => {
         if (profile) {
@@ -31,10 +38,92 @@ export default function Dashboard() {
                 uin: profile.uin || "",
             });
         }
+        fetchMfaFactors();
     }, [profile]);
+
+    async function fetchMfaFactors() {
+        try {
+            const { data, error } = await supabase.auth.mfa.listFactors();
+            if (error) throw error;
+            setMfaFactors(data.all || []);
+        } catch (err) {
+            console.error("Error fetching MFA factors:", err);
+        }
+    }
+
+    async function startMfaEnroll() {
+        setLoading(true);
+        setMfaMessage("");
+        try {
+            // Check for existing unverified factors and remove them to avoid conflicts
+            const { data: factors } = await supabase.auth.mfa.listFactors();
+            const unverified = factors?.all?.filter(f => f.status === 'unverified') || [];
+
+            for (const factor of unverified) {
+                await supabase.auth.mfa.unenroll({ factorId: factor.id });
+            }
+
+            const { data, error } = await supabase.auth.mfa.enroll({
+                factorType: 'totp',
+                friendlyName: `Authenticator ${new Date().toLocaleDateString()}`
+            });
+            if (error) throw error;
+            setEnrollData(data);
+        } catch (err) {
+            console.error("Enrollment error:", err);
+            setMfaMessage(err.message || "Failed to start enrollment.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function verifyMfaEnroll(e) {
+        e.preventDefault();
+        setLoading(true);
+        setMfaMessage("");
+        try {
+            const { error } = await supabase.auth.mfa.challengeAndVerify({
+                factorId: enrollData.id,
+                code: mfaCode
+            });
+            if (error) throw error;
+
+            // Update profile to mark 2FA as enabled
+            await supabase.from('profiles').update({ is_2fa_enabled: true }).eq('id', user.id);
+
+            setMfaMessage("2FA enrolled successfully!");
+            setEnrollData(null);
+            setMfaCode("");
+            fetchMfaFactors();
+        } catch (err) {
+            setMfaMessage(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function unenrollMfa(factorId) {
+        if (!confirm("Are you sure you want to disable 2FA?")) return;
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.mfa.unenroll({ factorId });
+            if (error) throw error;
+
+            // Update profile
+            await supabase.from('profiles').update({ is_2fa_enabled: false }).eq('id', user.id);
+
+            setMfaMessage("2FA disabled.");
+            fetchMfaFactors();
+        } catch (err) {
+            setMfaMessage(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     async function handlePasswordChange(e) {
         e.preventDefault();
+        // ... (existing password change logic remains the same)
         if (passwordForm.newPassword !== passwordForm.confirmPassword) {
             setMessage("Passwords do not match");
             return;
@@ -106,6 +195,74 @@ export default function Dashboard() {
                 <p><strong>Name:</strong> {profile?.first_name} {profile?.last_name}</p>
                 <p><strong>UIN:</strong> {profile?.uin}</p>
                 <p><strong>Account Status:</strong> {profile?.is_admin ? "Admin" : "Student"}</p>
+            </div>
+
+            <div className="mfa-section">
+                <h3>2-Factor Authentication (MFA)</h3>
+                {mfaMessage && <div className={`message ${mfaMessage.includes("success") ? "success" : "error"}`}>{mfaMessage}</div>}
+
+                {mfaFactors.filter(f => f.status === 'verified').length > 0 ? (
+                    <div>
+                        <p className="success-text">✓ 2FA is active on your account.</p>
+                        <ul>
+                            {mfaFactors.map(factor => (
+                                <li key={factor.id}>
+                                    Type: {factor.factor_type} (Status: {factor.status})
+                                    <button onClick={() => unenrollMfa(factor.id)} className="unenroll-btn" disabled={loading}>
+                                        Disable 2FA
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : (
+                    <div>
+                        <p>Protect your account with an Authenticator App (Google Authenticator, Duo, etc.)</p>
+                        {!enrollData ? (
+                            <div>
+                                {mfaFactors.some(f => f.status === 'unverified') && (
+                                    <p className="warning-text">You have an unverified 2FA setup. Please enable it again to finalize.</p>
+                                )}
+                                <button onClick={startMfaEnroll} className="signup-btn" disabled={loading}>
+                                    Set Up 2FA
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="mfa-enrollment">
+                                <p>1. Scan this QR code with your authenticator app:</p>
+                                {enrollData?.totp?.uri ? (
+                                    <div style={{ background: 'white', padding: '10px', display: 'inline-block' }}>
+                                        <QRCodeSVG value={enrollData.totp.uri} size={200} />
+                                    </div>
+                                ) : (
+                                    <p className="error-text">QR code data not available. Please try again.</p>
+                                )}
+                                <p>Or enter manually: <code>{enrollData?.totp?.secret || "N/A"}</code></p>
+
+                                <p>2. Enter the 6-digit code from your app:</p>
+                                <form onSubmit={verifyMfaEnroll}>
+                                    <Field label="Verification Code">
+                                        <input
+                                            type="text"
+                                            className="signup-input"
+                                            value={mfaCode}
+                                            onChange={(e) => setMfaCode(e.target.value)}
+                                            placeholder="000000"
+                                            maxLength={6}
+                                            required
+                                        />
+                                    </Field>
+                                    <button type="submit" className="signup-btn" disabled={loading}>
+                                        Verify & Activate
+                                    </button>
+                                    <button type="button" onClick={() => setEnrollData(null)} className="cancel-btn">
+                                        Cancel
+                                    </button>
+                                </form>
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
             <div className="profile-edit-section">

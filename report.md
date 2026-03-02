@@ -25,6 +25,8 @@ This project is a comprehensive User Authentication System built on a modern ful
 | Profile Management | Yes | Edit names and UIN from the user dashboard. |
 | Admin Dashboard | Yes | Restricted access to view all registered users. |
 | Change Password | Yes | Update password directly from the dashboard. |
+| 2-Factor Auth (MFA)| Yes | TOTP implementation (Authenticator Apps). |
+| SMTP Email Sys | Yes | Configured Gmail SMTP for reliable delivery. |
 
 ### Working Page Screenshots
 
@@ -50,8 +52,8 @@ List ALL specifications of this milestone and specify whether certain specificat
 | Yes | 6 | Admin dashboard with user listing capability |
 | Yes | 7 | Protected routes for authenticated users and admins |
 | Yes | 8 | Integration with Supabase for backend services |
-| No | 9 | Advanced Search (Planned for next milestone) |
-| No | 10 | Real-time Notifications (Planned for next milestone) |
+| Yes | 9 | 2-Factor Authentication (TOTP) enforcement |
+| Yes | 10 | SMTP Email Verification (Gmail integration) |
 
 ---
 
@@ -96,6 +98,7 @@ Describes your database design including a table showing fields, data types, key
 | last_name | TEXT | - | Smith |
 | uin | TEXT | - | `12345678` |
 | is_admin | BOOLEAN| - | `false` |
+| is_2fa_enabled | BOOLEAN| - | `true` |
 | created_at | TIMESTAMPTZ | - | `2026-03-01 12:00:00` |
 
 ---
@@ -123,3 +126,11 @@ The dashboard allows users to update their personal information. The server perf
 ### Admin Functionality
 Admin users can access a specialized dashboard. This is controlled by a boolean flag `is_admin` in the user's profile.
 - **File:** [AdminDashboard.jsx](file:///home/meeksonjr/odu/cs418/M1/Project/client/src/pages/AdminDashboard.jsx)
+
+### 2-Factor Authentication (MFA)
+Implemented TOTP (Time-based One-Time Password) using Supabase's `auth.mfa` API. The system handles enrollment (QR code), verification, and enforcement during the login flow (AAL2 verification).
+- **Files:** [Dashboard.jsx](file:///home/meeksonjr/odu/cs418/M1/Project/client/src/pages/Dashboard.jsx), [Login.jsx](file:///home/meeksonjr/odu/cs418/M1/Project/client/src/pages/Login.jsx), [ProtectedRoute.jsx](file:///home/meeksonjr/odu/cs418/M1/Project/client/src/components/ProtectedRoute.jsx)
+
+### SMTP Configuration
+Replaced the default Supabase provider with a custom Gmail SMTP configuration to ensure reliable delivery of verification and rest emails.
+- **Location:** Supabase Project Settings > Authentication > SMTP

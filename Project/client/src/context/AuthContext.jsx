@@ -9,13 +9,22 @@ export function AuthProvider({ children }) {
     const [session, setSession] = useState(null);
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [aal, setAal] = useState('aal1');
 
     useEffect(() => {
+        async function fetchAal() {
+            const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+            if (data) setAal(data.currentLevel);
+        }
+
         // Check active session
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
             setUser(session?.user ?? null);
-            if (session?.user) fetchProfile(session.user.id);
+            if (session?.user) {
+                fetchProfile(session.user.id);
+                fetchAal();
+            }
             else setLoading(false);
         });
 
@@ -23,9 +32,13 @@ export function AuthProvider({ children }) {
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
             setUser(session?.user ?? null);
-            if (session?.user) fetchProfile(session.user.id);
+            if (session?.user) {
+                fetchProfile(session.user.id);
+                fetchAal();
+            }
             else {
                 setProfile(null);
+                setAal('aal1');
                 setLoading(false);
             }
         });
@@ -58,6 +71,8 @@ export function AuthProvider({ children }) {
         session,
         profile,
         loading,
+        aal,
+        isAAL2: aal === 'aal2',
         isAdmin: profile?.is_admin || false,
         signOut: () => supabase.auth.signOut(),
     };
