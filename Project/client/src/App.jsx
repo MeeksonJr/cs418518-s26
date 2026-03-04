@@ -7,6 +7,8 @@ import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdvisingHistory from "./pages/AdvisingHistory";
+import AdvisingForm from "./pages/AdvisingForm";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./App.css";
 
@@ -27,6 +29,33 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/advising"
+              element={
+                <ProtectedRoute>
+                  <AdvisingHistory />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/advising/new"
+              element={
+                <ProtectedRoute>
+                  <AdvisingForm />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/advising/edit/:id"
+              element={
+                <ProtectedRoute>
+                  <AdvisingForm />
                 </ProtectedRoute>
               }
             />

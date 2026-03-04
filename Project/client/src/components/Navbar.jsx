@@ -25,6 +25,7 @@ export default function Navbar() {
                 ) : (
                     <>
                         <Link to="/dashboard">Dashboard</Link>
+                        <Link to="/advising">Course Advising</Link>
                         {isAdmin && <Link to="/admin">Admin</Link>}
                         <button onClick={handleLogout} className="logout-btn">Logout</button>
                     </>
