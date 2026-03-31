@@ -5,6 +5,14 @@ import { useAuth } from "../context/AuthContext";
 import { supabase } from "../supabaseClient";
 import "../App.css";
 
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    const yyyy = date.getFullYear();
+    return `${mm}/${dd}/${yyyy}`;
+};
+
 export default function AdvisingHistory() {
     const { user } = useAuth();
     const [records, setRecords] = useState([]);
@@ -62,7 +70,7 @@ export default function AdvisingHistory() {
                             <tr key={record.id}>
                                 <td>
                                     <Link to={`/advising/edit/${record.id}`}>
-                                        {new Date(record.created_at).toLocaleDateString()}
+                                        {formatDate(record.created_at)}
                                     </Link>
                                 </td>
                                 <td>{record.advising_term}</td>

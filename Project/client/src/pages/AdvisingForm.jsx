@@ -254,7 +254,7 @@ export default function AdvisingForm() {
                                 disabled={frozen}
                             />
                         </Field>
-                        <Field label="Advising Term">
+                        <Field label="Current Term">
                             <input
                                 type="text"
                                 name="advising_term"

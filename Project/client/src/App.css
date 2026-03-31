@@ -190,6 +190,22 @@
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
 }
 
+/* Fix for dropdown options readability in dark mode */
+.signup-input option {
+    background: #1a1a1a;
+    color: white;
+}
+
+/* Ensure the selector itself looks good when closed */
+select.signup-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.25rem;
+    padding-right: 2.5rem;
+}
+
 .signup-btn {
   background: linear-gradient(135deg, #007AFF 0%, #0051a8 100%);
   border: none;
@@ -353,6 +369,12 @@
     padding: 24px;
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.form-section:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 .message.warning {
@@ -378,6 +400,11 @@
     padding: 1.5rem;
     color: rgba(255, 255, 255, 0.9);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    text-align: left;
+}
+
+.users-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
 }
 
 .cancel-btn {
