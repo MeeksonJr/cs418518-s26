@@ -6,8 +6,9 @@ import { supabase } from "../supabaseClient";
 import Field from "../components/Field";
 import "../App.css";
 
-export default function AdvisingForm() {
-    const { id } = useParams();
+export default function AdvisingForm({ embeddedId, onSuccess }) {
+    const { id: routeId } = useParams();
+    const id = embeddedId || routeId;
     const navigate = useNavigate();
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
@@ -211,7 +212,11 @@ export default function AdvisingForm() {
 
             if (coursesError) throw coursesError;
 
-            navigate("/advising");
+            if (onSuccess) {
+                onSuccess();
+            } else {
+                navigate("/advising");
+            }
         } catch (err) {
             setError(err.message);
         } finally {
@@ -219,11 +224,19 @@ export default function AdvisingForm() {
         }
     };
 
+    const handleCancel = () => {
+        if (onSuccess) {
+            onSuccess(true); // Signal cancel
+        } else {
+            navigate("/advising");
+        }
+    };
+
     if (loading) return <div className="dashboard-container"><p>Loading...</p></div>;
 
     return (
-        <div className="dashboard-container">
-            <h2>{id ? "Edit Course Advising" : "New Course Advising"}</h2>
+        <div className={onSuccess ? "detail-form-container" : "dashboard-container"}>
+            <h2 style={onSuccess ? { fontSize: '1.8rem', marginBottom: '1.5rem' } : {}}>{id ? "Edit Course Plan" : "New Course Plan"}</h2>
 
             {error && (
                 <div className="error-alert" style={{
@@ -348,10 +361,10 @@ export default function AdvisingForm() {
                 <div style={{ marginTop: '30px', display: 'flex', gap: '10px' }}>
                     {!frozen && (
                         <button type="submit" className="signup-btn" disabled={saving}>
-                            {saving ? "Saving..." : "Submit Advising Record"}
+                            {saving ? (id ? "Updating..." : "Saving...") : (id ? "Update Record" : "Submit Plan")}
                         </button>
                     )}
-                    <button type="button" onClick={() => navigate("/advising")} className="cancel-btn">
+                    <button type="button" onClick={handleCancel} className="cancel-btn">
                         {frozen ? "Back" : "Cancel"}
                     </button>
                 </div>

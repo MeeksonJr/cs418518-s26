@@ -23,6 +23,7 @@ This milestone expands the project by implementing a dedicated **Course Advising
 | Dynamic Course Rows | Yes | Level and Course selection via dynamic dropdowns. |
 | Course Selection Rules | Yes | Prevents re-selection of courses taken in the last term. |
 | Pre-population & Locking| Yes | Auto-fills data; freezes records if Approved/Rejected. |
+| Modern Card History | Yes | Upgraded table to a premium card-based list view. |
 | Live Deployment | Yes | Successfully deployed on Vercel. |
 
 ---
@@ -47,9 +48,12 @@ This milestone expands the project by implementing a dedicated **Course Advising
 
 ## 3. Architecture & Implementation (40 points)
 
-### Course Advising History
-Records are fetched from the `advising_records` table, filtered by the logged-in user's ID. The status is displayed using color-coded badges, and the date format matches the requested `MM/DD/YYYY` scheme.
-- **File:** `client/src/pages/AdvisingHistory.jsx`
+### Course Advising Dashboard (Split-View)
+The system now uses a **Unified Master-Detail Dashboard**. This handles large numbers of records by moving the history list into an animated sidebar upon record selection.
+- **Master List:** Displays records with status badges and creation dates.
+- **Detail Form:** Slides in from the right with a smooth 0.6s cubic-bezier animation.
+- **State Management:** The dashboard orchestrates real-time syncing between the list and the form.
+- **Files:** `client/src/pages/AdvisingHistory.jsx`, `client/src/pages/AdvisingForm.jsx`
 
 ### Dynamic Form & Rules
 The advising form utilizes a dynamic state array for course plan rows. The "Course Selection Rule" is enforced by fetching the user's last approved record and comparing course names before submission.

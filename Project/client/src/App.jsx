@@ -41,21 +41,19 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/advising/new"
               element={
                 <ProtectedRoute>
-                  <AdvisingForm />
+                  <AdvisingHistory />
                 </ProtectedRoute>
               }
             />
-
             <Route
               path="/advising/edit/:id"
               element={
                 <ProtectedRoute>
-                  <AdvisingForm />
+                  <AdvisingHistory />
                 </ProtectedRoute>
               }
             />
