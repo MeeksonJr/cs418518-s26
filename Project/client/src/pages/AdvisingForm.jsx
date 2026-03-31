@@ -29,6 +29,13 @@ export default function AdvisingForm() {
 
     // Hardcoded options for level and courses as per project typical requirements
     const levels = ["Undergraduate", "Graduate"];
+    const termOptions = [
+        "Spring 2023", "Summer 2023", "Fall 2023",
+        "Spring 2024", "Summer 2024", "Fall 2024",
+        "Spring 2025", "Summer 2025", "Fall 2025",
+        "Spring 2026", "Summer 2026", "Fall 2026",
+        "Spring 2027", "Summer 2027", "Fall 2027"
+    ];
     const courseOptions = [
         "CS410 - Computer Graphics",
         "CS418 - Web Programming",
@@ -103,7 +110,7 @@ export default function AdvisingForm() {
                 `)
                 .eq('student_id', user.id)
                 .eq('advising_term', formData.last_term)
-                .eq('status', 'Approved');
+                .neq('status', 'Rejected');
 
             if (error) throw error;
 
@@ -147,6 +154,7 @@ export default function AdvisingForm() {
         for (const course of courses) {
             if (lastTermCourses.includes(course.course_name)) {
                 setError(`Error: You already took ${course.course_name} in your last term (${formData.last_term}).`);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 setSaving(false);
                 return;
             }
@@ -217,29 +225,49 @@ export default function AdvisingForm() {
         <div className="dashboard-container">
             <h2>{id ? "Edit Course Advising" : "New Course Advising"}</h2>
 
+            {error && (
+                <div className="error-alert" style={{
+                    background: 'rgba(255, 68, 68, 0.1)',
+                    border: '1px solid rgba(255, 68, 68, 0.3)',
+                    color: '#ff4444',
+                    padding: '12px 20px',
+                    borderRadius: '12px',
+                    marginBottom: '20px',
+                    fontSize: '0.95rem',
+                    backdropFilter: 'blur(10px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    animation: 'fadeIn 0.3s ease'
+                }}>
+                    <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+                    {error}
+                </div>
+            )}
+
             {frozen && (
                 <div className="message warning">
                     This record is <strong>{formData.status}</strong> and cannot be edited.
                 </div>
             )}
 
-            {error && <div className="message error">{error}</div>}
 
             <form onSubmit={handleSubmit} className="profile-edit-section" style={{ maxWidth: '800px' }}>
                 <div className="form-section">
                     <h3>History</h3>
                     <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                         <Field label="Last Term">
-                            <input
-                                type="text"
+                            <select
                                 name="last_term"
                                 className="signup-input"
                                 value={formData.last_term}
                                 onChange={handleFormChange}
-                                placeholder="e.g. Fall 2023"
                                 required
                                 disabled={frozen}
-                            />
+                            >
+                                <option value="">Select Last Term</option>
+                                {termOptions.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
                         </Field>
                         <Field label="Last GPA">
                             <input
@@ -255,16 +283,17 @@ export default function AdvisingForm() {
                             />
                         </Field>
                         <Field label="Current Term">
-                            <input
-                                type="text"
+                            <select
                                 name="advising_term"
                                 className="signup-input"
                                 value={formData.advising_term}
                                 onChange={handleFormChange}
-                                placeholder="e.g. Spring 2024"
                                 required
                                 disabled={frozen}
-                            />
+                            >
+                                <option value="">Select Current Term</option>
+                                {termOptions.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
                         </Field>
                     </div>
                 </div>
