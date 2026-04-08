@@ -47,7 +47,41 @@ This milestone expands the project by implementing a dedicated **Course Advising
 ---
 
 ## 3. Architecture & Implementation (40 points)
+```mermaid
+graph TD
+    User((User/Student))
+    
+    subgraph Vercel_Deployment [Live App: Vercel]
+        Frontend[React Frontend - Vite]
+        Router[React Router]
+    end
 
+    subgraph Backend_Services [Backend & Storage]
+        Express[Express.js Server]
+        SupaAuth[Supabase Auth]
+        SupaDB[(Supabase Postgres DB)]
+    end
+
+    %% User Interactions
+    User <-->|HTTPS/UI| Frontend
+    Frontend -->|Client-side Routing| Router
+    
+    %% Application Logic
+    Router <-->|Auth State| SupaAuth
+    Router <-->|Advising Records| SupaDB
+    Router <-->|Health Checks| Express
+
+    %% Database Relationships
+    SupaDB --- Table1[Profiles Table]
+    SupaDB --- Table2[Advising Records]
+    SupaDB --- Table3[Course Catalog]
+
+    %% Styling
+    style Vercel_Deployment fill:#f9f,stroke:#333,stroke-width:2px
+    style Backend_Services fill:#bbf,stroke:#333,stroke-width:2px
+    style User fill:#fff,stroke:#333
+```
+    
 ### Course Advising Dashboard (Split-View)
 The system now uses a **Unified Master-Detail Dashboard**. This handles large numbers of records by moving the history list into an animated sidebar upon record selection.
 - **Master List:** Displays records with status badges and creation dates.
