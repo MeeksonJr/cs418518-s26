@@ -66,9 +66,12 @@ export default function AdminReviewForm() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     recordId: id,
-                    email: student.email || student.username, // Fallback if email is username
+                    email: student.email || student.username,
                     status: status,
-                    message: feedback
+                    message: feedback,
+                    studentName: `${student.first_name} ${student.last_name}`,
+                    term: record.advising_term,
+                    courses: courses.map(c => `${c.level} - ${c.course_name}`)
                 })
             });
 
