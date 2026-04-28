@@ -83,8 +83,9 @@ export default function ResetPassword() {
             setMessage("Passwords do not match");
             return;
         }
-        if (passwordForm.newPassword.length < 6) {
-            setMessage("Password must be at least 6 characters");
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(passwordForm.newPassword)) {
+            setMessage("Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character");
             return;
         }
 

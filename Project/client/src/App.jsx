@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminReviewForm from "./pages/AdminReviewForm";
 import AdvisingHistory from "./pages/AdvisingHistory";
 import AdvisingForm from "./pages/AdvisingForm";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -63,6 +64,14 @@ function App() {
               element={
                 <ProtectedRoute adminOnly={true}>
                   <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/review/:id"
+              element={
+                <ProtectedRoute adminOnly={true}>
+                  <AdminReviewForm />
                 </ProtectedRoute>
               }
             />

@@ -38,7 +38,12 @@ export default function Register() {
         if (!form.lastName.trim()) e.lastName = "Last name is required";
         if (!/^\d{8}$/.test(form.uin)) e.uin = "UIN must be 8 digits";
         if (!form.email.includes("@")) e.email = "Valid email required";
-        if (form.password.length < 6) e.password = "Minimum 6 characters";
+        
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        if (!passwordRegex.test(form.password)) {
+            e.password = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character";
+        }
+
         if (form.password !== form.confirmPassword)
             e.confirmPassword = "Passwords do not match";
         return e;

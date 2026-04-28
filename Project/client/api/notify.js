@@ -1,31 +1,18 @@
+import { Resend } from 'resend';
+import { createClient } from '@supabase/supabase-js';
 
-const express = require('express');
-const cors = require('cors');
-const nodemailer = require('nodemailer');
-require('dotenv').config();
-
-const app = express();
-const port = process.env.PORT || 3000;
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Basic health check endpoint
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'Server is running' });
-});
-
-const { createClient } = require('@supabase/supabase-js');
-
-// Initialize Supabase with Service Role Key to bypass RLS
+const resend = new Resend(process.env.RESEND_API_KEY);
 const supabase = createClient(
     process.env.VITE_SUPABASE_URL,
     process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// Notify endpoint
-app.post('/api/notify', async (req, res) => {
+export default async function handler(req, res) {
+    // Only allow POST requests
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: "Method not allowed" });
+    }
+
     const { recordId, email, status, message } = req.body;
 
     if (!email || !status || !recordId) {
@@ -44,11 +31,11 @@ app.post('/api/notify', async (req, res) => {
             return res.status(500).json({ error: "Failed to update record in database" });
         }
 
-        const { Resend } = require('resend');
-        const resend = new Resend(process.env.RESEND_API_KEY);
-
+        // Send email using Resend
+        // NOTE: For unverified Resend domains, we MUST send FROM onboarding@resend.dev
+        // and TO the email address you signed up for Resend with!
         const { data, error } = await resend.emails.send({
-            from: 'onboarding@resend.dev', // Must use this for testing unverified domains
+            from: 'onboarding@resend.dev',
             to: email, 
             subject: `Advising Form ${status}`,
             text: `Your advising form has been ${status}.\n\nMessage from Admin: ${message || "No additional message."}`,
@@ -59,18 +46,9 @@ app.post('/api/notify', async (req, res) => {
             return res.status(500).json({ error: "Failed to send email via Resend" });
         }
 
-        console.log("Email sent successfully via Resend. ID:", data.id);
-        res.json({ success: true, messageId: data.id });
+        return res.status(200).json({ success: true, messageId: data.id });
     } catch (error) {
         console.error("Error sending email:", error);
-        res.status(500).json({ error: "Failed to process request" });
+        return res.status(500).json({ error: "Failed to process request" });
     }
-});
-
-if (require.main === module) {
-    app.listen(port, () => {
-        console.log(`Server running on port ${port}`);
-    });
 }
-
-module.exports = app; // export for testing

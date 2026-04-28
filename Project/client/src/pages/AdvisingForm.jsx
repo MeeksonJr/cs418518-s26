@@ -20,6 +20,8 @@ export default function AdvisingForm({ embeddedId, onSuccess }) {
         last_term: "",
         last_gpa: "",
         advising_term: "",
+        status: "",
+        message: ""
     });
 
     const [courses, setCourses] = useState([
@@ -75,6 +77,8 @@ export default function AdvisingForm({ embeddedId, onSuccess }) {
                 last_term: record.last_term,
                 last_gpa: record.last_gpa,
                 advising_term: record.advising_term,
+                status: record.status,
+                message: record.message
             });
 
             if (record.status === 'Approved' || record.status === 'Rejected') {
@@ -261,6 +265,12 @@ export default function AdvisingForm({ embeddedId, onSuccess }) {
             {frozen && (
                 <div className="message warning">
                     This record is <strong>{formData.status}</strong> and cannot be edited.
+                </div>
+            )}
+
+            {formData.message && (
+                <div className="message info" style={{ marginTop: '10px', background: 'rgba(0, 122, 255, 0.1)', border: '1px solid rgba(0, 122, 255, 0.3)', color: '#007aff', padding: '12px 20px', borderRadius: '12px' }}>
+                    <strong>Admin Feedback:</strong> {formData.message}
                 </div>
             )}
 

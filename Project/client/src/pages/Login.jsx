@@ -1,13 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
+import ReCAPTCHA from "react-google-recaptcha";
 import "../Signup.css";
 import Field from "../components/Field";
 
 export default function Login() {
     const navigate = useNavigate();
+    const recaptchaRef = useRef();
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [captchaVerified, setCaptchaVerified] = useState(false);
 
     const [form, setForm] = useState({
         email: "",
@@ -32,8 +35,22 @@ export default function Login() {
         checkMFAProgress();
     }, [navigate]);
 
+    const handleCaptchaChange = (value) => {
+        if (value) {
+            setCaptchaVerified(true);
+        } else {
+            setCaptchaVerified(false);
+        }
+    };
+
     async function handleLogin(e) {
         e.preventDefault();
+        
+        if (!captchaVerified) {
+            setMessage("Please verify the reCAPTCHA.");
+            return;
+        }
+
         setLoading(true);
         setMessage("");
 
@@ -67,6 +84,10 @@ export default function Login() {
             console.error("Login error:", err);
             setMessage(err.message || "Failed to login.");
             setLoading(false);
+            if (recaptchaRef.current) {
+                recaptchaRef.current.reset();
+                setCaptchaVerified(false);
+            }
         }
     }
 
@@ -162,7 +183,16 @@ export default function Login() {
                     />
                 </Field>
 
-                <button className="signup-btn" type="submit" disabled={loading}>
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+                    <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
+                        onChange={handleCaptchaChange}
+                        theme="dark"
+                    />
+                </div>
+
+                <button className="signup-btn" type="submit" disabled={loading || !captchaVerified}>
                     {loading ? "Logging in..." : "Login"}
                 </button>
 
