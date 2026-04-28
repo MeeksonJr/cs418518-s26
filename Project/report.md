@@ -51,15 +51,45 @@ The overall architecture follows a modern, decoupled serverless stack.
 
 ```mermaid
 graph TD
-    A[React Frontend]
-    B[(Supabase DB)]
-    C[Serverless API]
-    D[Resend API]
+    User((User/Admin))
+    
+    subgraph Vercel_Deployment [Live App: Vercel]
+        Frontend[React Frontend - Vite]
+        Router[React Router]
+        Serverless[Vercel Serverless Functions]
+    end
 
-    A -->|Auth & Data| B
-    A -->|Review Request| C
-    C -->|Bypass RLS| B
-    C -->|Send Email| D
+    subgraph Backend_Services [Backend & Storage]
+        SupaAuth[Supabase Auth]
+        SupaDB[(Supabase Postgres DB)]
+    end
+
+    subgraph External_APIs [Third-Party Services]
+        Resend[Resend Email API]
+        ReCAPTCHA[Google reCAPTCHA]
+    end
+
+    %% User Interactions
+    User <-->|HTTPS/UI| Frontend
+    Frontend -->|Client-side Routing| Router
+    
+    %% Application Logic
+    Router <-->|Auth State| SupaAuth
+    Router <-->|Direct Data Fetch| SupaDB
+    Router -->|Submit Review Request| Serverless
+    
+    %% Serverless Execution
+    Serverless -->|Bypass RLS Update| SupaDB
+    Serverless -->|Trigger Email| Resend
+    
+    %% Security
+    Frontend -->|Verify Human| ReCAPTCHA
+
+    %% Styling
+    style Vercel_Deployment fill:#f9f,stroke:#333,stroke-width:2px
+    style Backend_Services fill:#bbf,stroke:#333,stroke-width:2px
+    style External_APIs fill:#bfb,stroke:#333,stroke-width:2px
+    style User fill:#fff,stroke:#333
 ```
 
 ## 4. Implementation
