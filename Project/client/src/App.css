@@ -800,3 +800,51 @@ select.signup-input {
 .modal-close:hover {
     background: rgba(220, 53, 69, 0.8);
 }
+
+/* Bento Box Layout */
+.bento-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+@media (min-width: 900px) {
+    .bento-layout {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.bento-column {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.bento-full-height {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.bento-full-height .users-table {
+    margin-bottom: 0;
+}
+
+.bento-card {
+    background: rgba(30, 30, 30, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.bento-card h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 0.75rem;
+}
